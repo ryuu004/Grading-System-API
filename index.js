@@ -33,7 +33,7 @@ app.get("/teaching-loads", authenticate, (req, res) => {
 });
 
 app.get("/grades", authenticate, (req, res) => {
-  const { school_year_id, semester, program_code, section } = req.query;
+  const { school_year_id, semester, program_code, year_level, section, course_id } = req.query;
   const loads = getTeachingLoads(req.teacher.id);
   // Filter grades based on teaching loads
   let filteredGrades = grades.filter(g =>
@@ -50,17 +50,41 @@ app.get("/grades", authenticate, (req, res) => {
   if (school_year_id) filteredGrades = filteredGrades.filter(g => g.school_year_id == school_year_id);
   if (semester) filteredGrades = filteredGrades.filter(g => g.semester == semester);
   if (program_code) filteredGrades = filteredGrades.filter(g => g.program_code === program_code);
+  if (year_level) filteredGrades = filteredGrades.filter(g => g.year_level == year_level);
   if (section) filteredGrades = filteredGrades.filter(g => g.section === section);
+  if (course_id) filteredGrades = filteredGrades.filter(g => g.course_id === course_id);
 
   // Join with students for names
   const result = filteredGrades.map(g => {
     const student = students.find(s => s.id === g.student_id);
-    return { ...g, student_name: student ? student.name : 'Unknown' };
+    return {
+      student_id: g.student_id,
+      course_id: g.course_id,
+      grade: g.grade_value,
+      school_year_id: g.school_year_id,
+      semester: g.semester,
+      program_code: g.program_code,
+      year_level: g.year_level,
+      section: g.section,
+      student_name: student ? student.name : 'Unknown'
+    };
   });
 
+  // Metadata
+  const total_students = new Set(filteredGrades.map(g => g.student_id)).size;
+  const total_courses = new Set(filteredGrades.map(g => g.course_id)).size;
+
+  const response = {
+    grades: result,
+    metadata: {
+      total_students,
+      total_courses
+    }
+  };
+
   logAudit(req.teacher.id, 'view_grades', { filters: req.query });
-  console.log('Response:', JSON.stringify(result, null, 2));
-  res.json(result);
+  console.log('Response:', JSON.stringify(response, null, 2));
+  res.json(response);
 });
 
 app.post("/grades", authenticate, (req, res) => {

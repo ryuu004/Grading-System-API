@@ -4,47 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher API Tester</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-dark.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
             margin: 0;
             padding: 0;
             height: 100vh;
-            background-color: #1a1a1a;
-            color: #ffffff;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
             display: flex;
+            font-size: 14px;
         }
         .sidebar {
-            width: 250px;
-            background-color: #2d2d2d;
+            width: 280px;
+            background-color: #252526;
             padding: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+            border-right: 1px solid #3e3e42;
         }
         .sidebar h1 {
-            font-size: 18px;
+            font-size: 16px;
             margin-bottom: 20px;
-            color: #ff6b35;
+            color: #007acc;
+            font-weight: 600;
         }
         .sidebar ul {
             list-style: none;
             padding: 0;
         }
         .sidebar li {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         .sidebar button {
             width: 100%;
-            padding: 10px;
-            background-color: #3a3a3a;
-            color: #ffffff;
+            padding: 8px 12px;
+            background-color: transparent;
+            color: #cccccc;
             border: none;
-            border-radius: 4px;
+            border-radius: 3px;
             cursor: pointer;
             text-align: left;
-            transition: background-color 0.3s;
+            transition: all 0.2s;
+            font-size: 13px;
         }
         .sidebar button:hover, .sidebar button.active {
-            background-color: #ff6b35;
+            background-color: #37373d;
+            color: #ffffff;
         }
         .main {
             flex: 1;
@@ -53,61 +59,119 @@
         }
         .request {
             padding: 20px;
-            background-color: #252525;
-            border-bottom: 1px solid #3a3a3a;
-            flex: 1;
+            background-color: #1e1e1e;
+            border-bottom: 1px solid #3e3e42;
+            flex: 0 0 auto;
         }
         .request h2 {
             margin-top: 0;
-            color: #ff6b35;
+            color: #007acc;
+            font-size: 18px;
+            font-weight: 600;
         }
         .request form {
             display: flex;
             flex-direction: column;
+            gap: 12px;
         }
         .request label {
-            margin-bottom: 10px;
             display: flex;
             flex-direction: column;
+            gap: 4px;
+            color: #d4d4d4;
+            font-size: 13px;
         }
-        .request input {
-            padding: 8px;
-            margin-top: 5px;
-            background-color: #3a3a3a;
-            border: 1px solid #555;
-            color: #ffffff;
-            border-radius: 4px;
+        .request input, .request select {
+            padding: 6px 8px;
+            background-color: #3c3c3c;
+            border: 1px solid #565656;
+            color: #d4d4d4;
+            border-radius: 3px;
+            font-family: inherit;
+            font-size: 13px;
+        }
+        .request input:focus, .request select:focus {
+            outline: 1px solid #007acc;
         }
         .request button {
-            padding: 10px;
-            background-color: #ff6b35;
+            padding: 8px 16px;
+            background-color: #007acc;
             color: #ffffff;
             border: none;
-            border-radius: 4px;
+            border-radius: 3px;
             cursor: pointer;
             margin-top: 10px;
-            transition: background-color 0.3s;
+            transition: background-color 0.2s;
+            font-size: 13px;
+            align-self: flex-start;
         }
         .request button:hover {
-            background-color: #e55a2b;
+            background-color: #005a9e;
         }
         .response {
             padding: 20px;
             background-color: #1e1e1e;
             flex: 1;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .response.maximized {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #1e1e1e;
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .response.maximized .response-content {
+            height: calc(100vh - 60px);
         }
         .response h3 {
-            margin-top: 0;
-            color: #ff6b35;
+            margin: 0;
+            color: #007acc;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .copy-btn {
+            padding: 4px 8px;
+            background-color: #3c3c3c;
+            color: #d4d4d4;
+            border: 1px solid #565656;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.2s;
+        }
+        .copy-btn:hover {
+            background-color: #505050;
+        }
+        .response-content {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #1e1e1e;
+            border: 1px solid #3e3e42;
+            border-radius: 3px;
         }
         #response {
-            white-space: pre-wrap;
-            background-color: #2d2d2d;
+            margin: 0;
             padding: 10px;
-            border-radius: 4px;
-            color: #ffffff;
-            font-family: 'Courier New', monospace;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: inherit;
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre;
+            overflow-x: auto;
         }
     </style>
 </head>
@@ -138,17 +202,27 @@
             <div id="gradesForm" class="form-section" style="display: none;">
                 <h2>View Grades</h2>
                 <form>
-                    <label>School Year: <input type="text" id="schoolYear" placeholder="2023-2024"></label>
-                    <label>Semester: <input type="number" id="semester" placeholder="1"></label>
-                    <label>Program Code: <input type="text" id="programCode" placeholder="CS"></label>
-                    <label>Section: <input type="text" id="section" placeholder="A"></label>
+                    <label>School Year ID: <select id="schoolYearId"><option value="">All</option></select></label>
+                    <label>Semester: <select id="semester"><option value="">All</option></select></label>
+                    <label>Program Code: <select id="programCode"><option value="">All</option></select></label>
+                    <label>Year Level: <select id="yearLevel"><option value="">All</option></select></label>
+                    <label>Section: <select id="section"><option value="">All</option></select></label>
+                    <label>Course ID: <select id="courseId"><option value="">All</option></select></label>
                     <button type="submit">Send</button>
                 </form>
             </div>
         </div>
         <div class="response">
-            <h3>Response</h3>
-            <div id="response"></div>
+            <div class="response-header">
+                <h3>Response</h3>
+                <div>
+                    <button class="copy-btn" id="copyBtn">Copy</button>
+                    <button class="copy-btn" id="maximizeBtn">Max</button>
+                </div>
+            </div>
+            <div class="response-content">
+                <pre id="response"><code class="language-json"></code></pre>
+            </div>
         </div>
     </div>
 
