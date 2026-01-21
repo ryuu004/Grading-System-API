@@ -17,10 +17,25 @@ document.getElementById('gradesBtn').addEventListener('click', () => showForm('g
 // Show login by default
 showForm('loginForm');
 
-document.querySelector('#loginForm form').addEventListener('submit', function(e) {
+document.querySelector('#loginForm form').addEventListener('submit', async function(e) {
     e.preventDefault();
-    apiKey = document.getElementById('apiKey').value;
-    document.getElementById('response').textContent = 'Logged in with API key: ' + apiKey;
+    const key = document.getElementById('apiKey').value;
+    try {
+        const res = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ api_key: key })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            apiKey = key;
+            document.getElementById('response').textContent = 'Logged in as ' + data.teacher.name;
+        } else {
+            document.getElementById('response').textContent = data.error;
+        }
+    } catch (err) {
+        document.getElementById('response').textContent = 'Error: ' + err.message;
+    }
 });
 
 document.querySelector('#loadsForm form').addEventListener('submit', async function(e) {

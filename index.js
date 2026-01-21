@@ -10,6 +10,20 @@ app.get("/", (req, res) => {
   res.json({ message: "Teacher API Simulation running" });
 });
 
+app.post("/login", (req, res) => {
+  const { api_key } = req.body;
+  if (!api_key) {
+    return res.status(400).json({ error: 'API key required' });
+  }
+  const teacher = teachers.find(t => t.api_key === api_key && t.active && new Date(t.expiration_date) > new Date());
+  if (!teacher) {
+    return res.status(401).json({ error: 'Invalid or expired API key' });
+  }
+  // Return teacher info without api_key
+  const { api_key: _, ...teacherInfo } = teacher;
+  res.json({ teacher: teacherInfo });
+});
+
 // Protected routes
 app.get("/teaching-loads", authenticate, (req, res) => {
   const loads = getTeachingLoads(req.teacher.id);
