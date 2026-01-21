@@ -115,7 +115,7 @@ document.querySelector('#loginForm form').addEventListener('submit', async funct
         const data = await res.json();
         if (res.ok) {
             apiKey = key;
-            setResponse('Logged in as ' + data.teacher.name);
+            setResponse('Logged in as ' + data.user.type + ' ' + data.user.name);
         } else {
             setResponse(data.error);
         }

@@ -15,6 +15,20 @@ const school_years = [
   }
 ];
 
+const courses = [
+  { id: 1, code: 'MATH101', name: 'Mathematics 101' },
+  { id: 2, code: 'CS101', name: 'Computer Science 101' },
+  { id: 3, code: 'ENG101', name: 'English 101' },
+  { id: 4, code: 'HIST101', name: 'History 101' },
+  { id: 5, code: 'SCIENCE', name: 'Science' },
+  { id: 6, code: 'MATH', name: 'Mathematics' }
+];
+
+const programs = [
+  { code: 'CS', name: 'Computer Science' },
+  { code: 'BA', name: 'Business Administration' }
+];
+
 const teachers = [
   {
     id: 1,
@@ -45,6 +59,18 @@ const teachers = [
   }
 ];
 
+const admins = [
+  {
+    id: 1,
+    name: 'Admin User',
+    api_key: 'admin_key_1',
+    active: true,
+    expiration_date: '2027-01-01',
+    created_at: new Date(),
+    updated_at: new Date()
+  }
+];
+
 const teaching_loads = [
   {
     id: 1,
@@ -53,6 +79,7 @@ const teaching_loads = [
     section: 'A',
     year_level: 1,
     program_code: 'CS',
+    school_level: 'COLLEGE',
     school_year_id: 1,
     semester: 1,
     role: 'subject_teacher',
@@ -67,6 +94,7 @@ const teaching_loads = [
     section: 'B',
     year_level: 1,
     program_code: 'CS',
+    school_level: 'COLLEGE',
     school_year_id: 1,
     semester: 1,
     role: 'subject_teacher',
@@ -81,6 +109,7 @@ const teaching_loads = [
     section: 'A',
     year_level: 2,
     program_code: 'BA',
+    school_level: 'COLLEGE',
     school_year_id: 1,
     semester: 2,
     role: 'subject_teacher',
@@ -95,6 +124,7 @@ const teaching_loads = [
     section: 'A',
     year_level: 2,
     program_code: 'BA',
+    school_level: 'COLLEGE',
     school_year_id: 1,
     semester: 2,
     role: 'adviser',
@@ -109,6 +139,7 @@ const teaching_loads = [
     section: '1',
     year_level: 7,
     program_code: null,
+    school_level: 'K-12',
     school_year_id: 1,
     semester: 0,
     role: 'subject_teacher',
@@ -123,6 +154,7 @@ const teaching_loads = [
     section: '1',
     year_level: 7,
     program_code: null,
+    school_level: 'K-12',
     school_year_id: 1,
     semester: 0,
     role: 'adviser',
@@ -140,6 +172,8 @@ const students = [
     program_code: 'CS',
     year_level: 1,
     section: 'A',
+    school_level: 'COLLEGE',
+    year_code: 'COL-1',
     created_at: new Date()
   },
   {
@@ -149,6 +183,8 @@ const students = [
     program_code: 'CS',
     year_level: 1,
     section: 'B',
+    school_level: 'COLLEGE',
+    year_code: 'COL-1',
     created_at: new Date()
   },
   {
@@ -158,6 +194,8 @@ const students = [
     program_code: 'BA',
     year_level: 2,
     section: 'A',
+    school_level: 'COLLEGE',
+    year_code: 'COL-2',
     created_at: new Date()
   },
   {
@@ -167,6 +205,8 @@ const students = [
     program_code: null,
     year_level: 7,
     section: '1',
+    school_level: 'K-12',
+    year_code: 'K12-7',
     created_at: new Date()
   },
   {
@@ -176,6 +216,8 @@ const students = [
     program_code: null,
     year_level: 7,
     section: '1',
+    school_level: 'K-12',
+    year_code: 'K12-7',
     created_at: new Date()
   }
 ];
@@ -188,6 +230,8 @@ const grades = [
     section: 'A',
     year_level: 1,
     program_code: 'CS',
+    school_level: 'COLLEGE',
+    year_code: 'COL-1',
     school_year_id: 1,
     semester: 1,
     grade_value: 85,
@@ -202,6 +246,8 @@ const grades = [
     section: 'B',
     year_level: 1,
     program_code: 'CS',
+    school_level: 'COLLEGE',
+    year_code: 'COL-1',
     school_year_id: 1,
     semester: 1,
     grade_value: 90,
@@ -216,6 +262,8 @@ const grades = [
     section: 'A',
     year_level: 2,
     program_code: 'BA',
+    school_level: 'COLLEGE',
+    year_code: 'COL-2',
     school_year_id: 1,
     semester: 2,
     grade_value: 88,
@@ -230,6 +278,8 @@ const grades = [
     section: 'A',
     year_level: 2,
     program_code: 'BA',
+    school_level: 'COLLEGE',
+    year_code: 'COL-2',
     school_year_id: 1,
     semester: 2,
     grade_value: 92,
@@ -244,6 +294,8 @@ const grades = [
     section: '1',
     year_level: 7,
     program_code: null,
+    school_level: 'K-12',
+    year_code: 'K12-7',
     school_year_id: 1,
     semester: 0,
     grade_value: 87,
@@ -258,6 +310,8 @@ const grades = [
     section: '1',
     year_level: 7,
     program_code: null,
+    school_level: 'K-12',
+    year_code: 'K12-7',
     school_year_id: 1,
     semester: 0,
     grade_value: 95,
@@ -272,6 +326,9 @@ const audit_logs = []; // Array to push logs
 module.exports = {
   school_years,
   teachers,
+  admins,
+  courses,
+  programs,
   teaching_loads,
   students,
   grades,
