@@ -11,17 +11,22 @@
             font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
             margin: 0;
             padding: 0;
-            height: 100vh;
+            min-height: 100vh;
             background-color: #1e1e1e;
             color: #d4d4d4;
-            display: flex;
             font-size: 14px;
         }
         .sidebar {
-            width: 280px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 350px;
+            height: 100vh;
             background-color: #252526;
             padding: 20px;
             border-right: 1px solid #3e3e42;
+            overflow-y: auto;
+            z-index: 1;
         }
         .sidebar h1 {
             font-size: 16px;
@@ -53,9 +58,10 @@
             color: #ffffff;
         }
         .main {
-            flex: 1;
+            margin-left: 390px;
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
         }
         .request {
             padding: 20px;
@@ -173,6 +179,134 @@
             white-space: pre;
             overflow-x: auto;
         }
+        .highlight {
+            color: #007acc;
+            font-weight: bold;
+        }
+        .active-filter label {
+            color: #007acc;
+            font-weight: bold;
+        }
+        .active-filter select {
+            border-color: #007acc;
+        }
+        .endpoints-list {
+            padding: 0;
+        }
+        .endpoint-group {
+            margin-bottom: 20px;
+        }
+        .endpoint-group h3 {
+            color: #007acc;
+            font-size: 14px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #3e3e42;
+            padding-bottom: 5px;
+        }
+        .endpoint {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #2d2d30;
+            font-size: 13px;
+        }
+        .endpoint:last-child {
+            border-bottom: none;
+        }
+        .method {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 11px;
+            min-width: 45px;
+            text-align: center;
+        }
+        .method.get {
+            background-color: #61affe;
+            color: white;
+        }
+        .method.post {
+            background-color: #49cc90;
+            color: white;
+        }
+        .method.put {
+            background-color: #fca130;
+            color: white;
+        }
+        .method.delete {
+            background-color: #f93e3e;
+            color: white;
+        }
+        .url {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            color: #d4d4d4;
+            font-weight: bold;
+            min-width: 150px;
+        }
+        .description {
+            color: #cccccc;
+            font-size: 12px;
+        }
+        .request-url {
+            background-color: #2d2d30;
+            border: 1px solid #3e3e42;
+            border-radius: 3px;
+            padding: 8px 12px;
+            margin: 10px 0;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            font-size: 12px;
+            color: #007acc;
+            word-break: break-all;
+        }
+        .request-url .method-badge {
+            background-color: #007acc;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            margin-right: 8px;
+        }
+        .endpoint-details {
+            margin-left: 65px;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #2d2d30;
+            border-radius: 3px;
+            border-left: 3px solid #007acc;
+        }
+        .endpoint-details h4 {
+            color: #007acc;
+            font-size: 12px;
+            margin: 0 0 8px 0;
+        }
+        .query-params, .request-body, .example-urls {
+            margin-bottom: 15px;
+        }
+        .param {
+            display: flex;
+            margin-bottom: 5px;
+            font-size: 11px;
+        }
+        .param-name {
+            color: #fca130;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            font-weight: bold;
+            min-width: 120px;
+        }
+        .param-desc {
+            color: #cccccc;
+        }
+        .example-url {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            background-color: #1e1e1e;
+            padding: 4px 8px;
+            margin: 3px 0;
+            border-radius: 3px;
+            font-size: 11px;
+            color: #61affe;
+            border: 1px solid #3e3e42;
+        }
     </style>
 </head>
 <body>
@@ -181,7 +315,8 @@
         <ul>
             <li><button id="loginBtn">Login</button></li>
             <li><button id="loadsBtn">Teaching Loads</button></li>
-            <li><button id="gradesBtn">View Grades</button></li>
+            <li><button id="gradesBtn">Grade Query</button></li>
+            <li><button id="endpointsBtn">API Endpoints</button></li>
         </ul>
     </div>
     <div class="main">
@@ -196,11 +331,18 @@
             <div id="loadsForm" class="form-section" style="display: none;">
                 <h2>View Teaching Loads</h2>
                 <form>
+                    <label>School Year ID: <select id="loadsSchoolYearId"><option value="">All</option></select></label>
+                    <label>Semester: <select id="loadsSemester"><option value="">All</option></select></label>
+                    <label>Program Code: <select id="loadsProgramCode"><option value="">All</option></select></label>
+                    <label>Year Level: <select id="loadsYearLevel"><option value="">All</option></select></label>
+                    <label>Section: <select id="loadsSection"><option value="">All</option></select></label>
+                    <label>Course ID: <select id="loadsCourseId"><option value="">All</option></select></label>
+                    <label>Teacher ID: <select id="loadsTeacherId"><option value="">All</option></select></label>
                     <button type="submit">Send</button>
                 </form>
             </div>
             <div id="gradesForm" class="form-section" style="display: none;">
-                <h2>View Grades</h2>
+                <h2>Grade Query</h2>
                 <form>
                     <label>School Year ID: <select id="schoolYearId"><option value="">All</option></select></label>
                     <label>Semester: <select id="semester"><option value="">All</option></select></label>
@@ -210,6 +352,190 @@
                     <label>Course ID: <select id="courseId"><option value="">All</option></select></label>
                     <button type="submit">Send</button>
                 </form>
+            </div>
+            <div id="endpointsForm" class="form-section" style="display: none;">
+                <h2>API Endpoints</h2>
+                <div class="endpoints-list">
+                    <div class="endpoint-group">
+                        <h3>Authentication</h3>
+                        <div class="endpoint">
+                            <span class="method post">POST</span>
+                            <span class="url">/login</span>
+                            <span class="description">Authenticate with API key</span>
+                        </div>
+                    </div>
+                    <div class="endpoint-group">
+                        <h3>Teaching Loads</h3>
+                        <div class="endpoint">
+                            <span class="method get">GET</span>
+                            <span class="url">/teaching-loads</span>
+                            <span class="description">View teaching assignments</span>
+                        </div>
+                        <div class="endpoint-details">
+                            <div class="query-params">
+                                <h4>Query Parameters (all optional):</h4>
+                                <div class="param">
+                                    <span class="param-name">school_year_id</span>
+                                    <span class="param-desc">Filter by school year ID</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">school_level</span>
+                                    <span class="param-desc">Filter by school level</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">program_code</span>
+                                    <span class="param-desc">Filter by program code</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">year_level</span>
+                                    <span class="param-desc">Filter by year level</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">section</span>
+                                    <span class="param-desc">Filter by section</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">teacher_id</span>
+                                    <span class="param-desc">Filter by teacher ID</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">course_id</span>
+                                    <span class="param-desc">Filter by course ID</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">page</span>
+                                    <span class="param-desc">Page number for pagination (default: 1)</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">limit</span>
+                                    <span class="param-desc">Items per page (default: 10)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="endpoint">
+                            <span class="method post">POST</span>
+                            <span class="url">/teaching-loads</span>
+                            <span class="description">Create new teaching load (Admin only)</span>
+                        </div>
+                        <div class="endpoint-details">
+                            <div class="request-body">
+                                <h4>Request Body (all required):</h4>
+                                <div class="param">
+                                    <span class="param-name">teacher_id</span>
+                                    <span class="param-desc">Teacher ID</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">course_id</span>
+                                    <span class="param-desc">Course ID</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">section</span>
+                                    <span class="param-desc">Section name</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">year_level</span>
+                                    <span class="param-desc">Year level</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">program_code</span>
+                                    <span class="param-desc">Program code (optional)</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">school_level</span>
+                                    <span class="param-desc">School level</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">school_year_id</span>
+                                    <span class="param-desc">School year ID</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">semester</span>
+                                    <span class="param-desc">Semester</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">role</span>
+                                    <span class="param-desc">Teacher role</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="endpoint">
+                            <span class="method put">PUT</span>
+                            <span class="url">/teaching-loads/:id</span>
+                            <span class="description">Update teaching load (Admin only)</span>
+                        </div>
+                        <div class="endpoint">
+                            <span class="method delete">DELETE</span>
+                            <span class="url">/teaching-loads/:id</span>
+                            <span class="description">Deactivate teaching load (Admin only)</span>
+                        </div>
+                    </div>
+                    <div class="endpoint-group">
+                        <h3>Grades</h3>
+                        <div class="endpoint">
+                            <span class="method get">GET</span>
+                            <span class="url">/grades</span>
+                            <span class="description">Query student grades with filters</span>
+                        </div>
+                        <div class="endpoint-details">
+                            <div class="query-params">
+                                <h4>Query Parameters (all optional):</h4>
+                                <div class="param">
+                                    <span class="param-name">school_year_id</span>
+                                    <span class="param-desc">Filter by school year ID</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">semester</span>
+                                    <span class="param-desc">Filter by semester</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">program_code</span>
+                                    <span class="param-desc">Filter by program code</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">year_level</span>
+                                    <span class="param-desc">Filter by year level</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">section</span>
+                                    <span class="param-desc">Filter by section</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">course_id</span>
+                                    <span class="param-desc">Filter by course ID</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">teacher_id</span>
+                                    <span class="param-desc">Filter by teacher ID (Admin only)</span>
+                                </div>
+                            </div>
+                            <div class="example-urls">
+                                <h4>Example URLs:</h4>
+                                <div class="example-url">/grades</div>
+                                <div class="example-url">/grades?school_year_id=2024&semester=1</div>
+                                <div class="example-url">/grades?program_code=BSIT&year_level=3&section=A</div>
+                                <div class="example-url">/grades?course_id=IT101&teacher_id=1</div>
+                            </div>
+                        </div>
+                        <div class="endpoint">
+                            <span class="method post">POST</span>
+                            <span class="url">/grades</span>
+                            <span class="description">Update student grade</span>
+                        </div>
+                        <div class="endpoint-details">
+                            <div class="request-body">
+                                <h4>Request Body:</h4>
+                                <div class="param">
+                                    <span class="param-name">id</span>
+                                    <span class="param-desc">Grade record ID (required)</span>
+                                </div>
+                                <div class="param">
+                                    <span class="param-name">grade_value</span>
+                                    <span class="param-desc">New grade value (required)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="response">

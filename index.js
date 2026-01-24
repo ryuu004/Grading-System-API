@@ -35,24 +35,24 @@ app.get("/teaching-loads", authenticate, (req, res) => {
     loads = getTeachingLoads(req.user.data.id);
   } else if (req.user.type === 'admin') {
     loads = teaching_loads.filter(tl => tl.is_active); // Admins can see all active
-    // Apply filters
-    const { school_year_id, school_level, program_code, year_level, section, teacher_id, course_id } = req.query;
-    if (school_year_id) loads = loads.filter(tl => tl.school_year_id == school_year_id);
-    if (school_level) loads = loads.filter(tl => tl.school_level === school_level);
-    if (program_code) loads = loads.filter(tl => tl.program_code === program_code);
-    if (year_level) loads = loads.filter(tl => tl.year_level == year_level);
-    if (section) loads = loads.filter(tl => tl.section === section);
-    if (teacher_id) loads = loads.filter(tl => tl.teacher_id == teacher_id);
-    if (course_id) loads = loads.filter(tl => tl.course_id === course_id);
-    // Pagination
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const start = (page - 1) * limit;
-    const paginatedLoads = loads.slice(start, start + limit);
-    // Sorting, simple by id
-    paginatedLoads.sort((a, b) => a.id - b.id);
-    loads = paginatedLoads;
   }
+  // Apply filters for both teachers and admins
+  const { school_year_id, school_level, program_code, year_level, section, teacher_id, course_id } = req.query;
+  if (school_year_id) loads = loads.filter(tl => tl.school_year_id == school_year_id);
+  if (school_level) loads = loads.filter(tl => tl.school_level === school_level);
+  if (program_code) loads = loads.filter(tl => tl.program_code === program_code);
+  if (year_level) loads = loads.filter(tl => tl.year_level == year_level);
+  if (section) loads = loads.filter(tl => tl.section === section);
+  if (teacher_id) loads = loads.filter(tl => tl.teacher_id == teacher_id);
+  if (course_id) loads = loads.filter(tl => tl.course_id === course_id);
+  // Pagination (for admins, since teachers might not need it, but apply anyway)
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const start = (page - 1) * limit;
+  const paginatedLoads = loads.slice(start, start + limit);
+  // Sorting, simple by id
+  paginatedLoads.sort((a, b) => a.id - b.id);
+  loads = paginatedLoads;
   logAudit(req.user, 'view_teaching_loads', { filters: req.query });
   console.log('Response:', JSON.stringify(loads, null, 2));
   res.json(loads);
